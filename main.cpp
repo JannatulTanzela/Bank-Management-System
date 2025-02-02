@@ -13,6 +13,7 @@ class account
 public:
     void create_account();
     void show_account() const;
+    void modify();
     void dep(int);
     void draw(int);
     void report() const;
@@ -96,6 +97,18 @@ void account::show_account() const
     cout << "\n\tType of Account : " << type;
     cout << "\n\tBalance amount : " << deposit;
 }
+void account::modify()
+{
+    cout << "\n\tAccount No. : " << acno;
+    cout << "\n\tModify Account Holder Name : ";
+    cin.ignore();
+    cin.getline(name, 50);
+    cout << "\n\tModify Type of Account : ";
+    cin >> type;
+    type = toupper(type);
+    cout << "\n\tModify Balance amount : ";
+    cin >> deposit;
+}
 
 
 void account::dep(int x)
@@ -129,6 +142,7 @@ char account::rettype() const
 }
 void write_account();
 void display_sp(int);
+void modify_account(int);
 void delete_account(int);
 void display_all();
 void deposit_withdraw(int, int);
@@ -151,8 +165,9 @@ int main()
         cout << "\n\t4. BALANCE ENQUIRY";
         cout << "\n\t5. ALL ACCOUNT HOLDER LIST";
         cout << "\n\t6. CLOSE AN ACCOUNT";
-        cout << "\n\t7. EXIT";
-        cout << "\n\n\tSelect Your Option (1-7): ";
+        cout << "\n\t7. MODIFY AN ACCOUNT";
+        cout << "\n\t8. EXIT";
+        cout << "\n\n\tSelect Your Option (1-8): ";
         cin >> ch;
         switch (ch)
         {
@@ -187,6 +202,12 @@ int main()
             delete_account(num);
             break;
         case '7':
+            system("CLS");
+            cout << "\n\n\tEnter The account No. : ";
+            cin >> num;
+            modify_account(num);
+            break;
+        case '8':
             break;
         default:
             cout << "\a";
@@ -194,7 +215,7 @@ int main()
         cin.ignore();
         cin.get();
     }
-    while (ch != '7');
+    while (ch != '8');
     return 0;
 }
 void write_account()
@@ -206,7 +227,6 @@ void write_account()
     outFile.write(reinterpret_cast<char*> (&ac), sizeof(account));
     outFile.close();
 }
-
 void display_sp(int n)
 {
     account ac;
@@ -230,6 +250,38 @@ void display_sp(int n)
     inFile.close();
     if (flag == false)
         cout << "\n\n\tAccount number does not exist";
+}
+
+void modify_account(int n)
+{
+    account ac;
+    bool found = false;
+    fstream File;
+    File.open("account.data", ios::binary | ios::in | ios::out);
+    if (!File)
+    {
+        cout << "File could not be opened!! Press any Key...";
+        return;
+    }
+    while (File.read(reinterpret_cast<char*>(&ac), sizeof(account)))
+    {
+        if (ac.retacno() == n)
+        {
+            ac.show_account();
+            cout << "\n\n\tEnter new details of account\n";
+            ac.modify();
+            int pos = (-1) * static_cast<int>(sizeof(account));
+            File.seekp(pos, ios::cur);
+            File.write(reinterpret_cast<char*>(&ac), sizeof(account));
+            found = true;
+            break;
+        }
+    }
+    File.close();
+    if (!found)
+    {
+        cout << "\n\n\t\t\tAccount not found!";
+    }
 }
 
 
